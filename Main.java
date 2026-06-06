@@ -1,35 +1,57 @@
+package sistema.persistencia;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class Main {
+
     public static void main(String[] args) {
-        System.out.println("=== PRUEBA DE ENCAPSULAMIENTO Y SEGURIDAD DE DATOS ===\n");
 
-        // A. Creación (instanciación) de un objeto Producto con valores válidos
-        Producto laptop = new Producto("LAP-001", "Laptop ASUS Core i7", 18500.0, 15);
+        System.out.println("=== SISTEMA DE PERSISTENCIA DIGITAL DE OBJETOS V1.0 ===\n");
 
-        // B. Lectura inicial de datos a través de métodos Get
-        System.out.println("--- Datos iniciales del producto ---");
-        System.out.println("Código: " + laptop.getCodigo());
-        System.out.println("Producto: " + laptop.getNombre());
-        System.out.println("Precio: $" + laptop.getPrecio());
-        System.out.println("Stock en Bodega: " + laptop.getStock() + " unidades\n");
+        String nombreArchivo = "datos_estudiantes.dat";
 
-        System.out.println("--- Prueba de Inyección de Datos Erróneos ---");
-        // C. Intento de asignar un precio negativo (El sistema debe rechazarlo)
-        System.out.print("[Intentando setear precio a -$500.0]: ");
-        laptop.setPrecio(-500.0);
-        
-        // D. Intento de asignar un stock negativo (El sistema debe rechazarlo)
-        System.out.print("[Intentando setear stock a -5 unidades]: ");
-        laptop.setStock(-5);
+        // 1. Creación e inserción inicial de datos en memoria RAM
+        List<Estudiante> listaOriginal = new ArrayList<>();
+
+        listaOriginal.add(new Estudiante("S2101023", "Marco Mendoza", 9.5));
+        listaOriginal.add(new Estudiante("S2101024", "Ana Mendoza", 9.8));
+        listaOriginal.add(new Estudiante("S2101025", "Luis Mendoza", 8.9));
+
+        System.out.println("--- 1. Estado Inicial en la Memoria RAM Volátil ---");
+
+        for (Estudiante e : listaOriginal) {
+            System.out.println(e);
+        }
+
         System.out.println();
 
-        // E. Comprobación de integridad: Los datos no cambiaron a pesar de los intentos maliciosos
-        System.out.println("--- Comprobación de integridad del objeto ---");
-        System.out.println("Precio actual verificado: $" + laptop.getPrecio());
-        System.out.println("Stock actual verificado: " + laptop.getStock() + " unidades\n");
+        // 2. Proceso de serialización
+        System.out.println("--- 2. Iniciando Flujo de Datos hacia Almacenamiento Secundario ---");
+        GestorPersistencia.guardarObjetos(nombreArchivo, listaOriginal);
 
-        // F. Ejecución del método de negocio
-        System.out.println("--- Ejecución de Operación Comercial ---");
-        laptop.aplicarDescuento(10.0); // Aplicamos un 10% de descuento
-        System.out.println("Nuevo precio al público: $" + laptop.getPrecio());
+        System.out.println();
+
+        // 3. Simulación de apagado del sistema
+        listaOriginal = null;
+
+        System.out.println("--- 3. Simulación de Apagado: Datos de la RAM eliminados (Lista = null) ---\n");
+
+        // 4. Recuperación de los datos desde el archivo binario
+        System.out.println("--- 4. Leyendo Flujo de Entrada desde el Archivo Binario ---");
+
+        List<Estudiante> listaRestaurada =
+                GestorPersistencia.recuperarObjetos(nombreArchivo);
+
+        System.out.println();
+
+        // 5. Verificación de la persistencia
+        System.out.println("--- 5. Datos Rehidratados Exitosamente en Memoria RAM ---");
+
+        for (Estudiante e : listaRestaurada) {
+            System.out.println(e);
+        }
+
+        System.out.println("\nConclusión: Los objetos sobrevivieron al ciclo de vida del programa.");
     }
 }
